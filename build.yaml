@@ -1,0 +1,8 @@
+builders:
+  jsonAnnotationPlus:
+    import: 'package:json_serializable_plus/json_serializable_plus.dart'
+    builder_factories: ['jsonAnnotationPlus']
+    auto_apply: dependents
+    build_extensions: {".dart": [".serialize.part"]}
+    build_to: cache
+    applies_builders: ["source_gen|combining_builder"]
