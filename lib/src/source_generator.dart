@@ -66,37 +66,37 @@ class SerializeGenerator extends GeneratorForAnnotation<JsonAnnotationPlus> {
             }
           }
         } else if (field.typeData.isDartCoreInt) {
-          if (field.defaultValue != null) {
-            buffer.writeln(
-                "${field.key}: pick(json, '${field.annotationKeyName ?? field.key}', initialValue: ${field.defaultValue}).asIntorInitialValue,");
-          } else {
-            buffer.writeln(
-                "${field.key}: pick(json, '${field.annotationKeyName ?? field.key}').${(field.isNullable) ? 'asIntorNull' : 'asIntorThrow'} ,");
-          }
+          // if (field.defaultValue != null) {
+          //   buffer.writeln(
+          //       "${field.key}: pick(json, '${field.annotationKeyName ?? field.key}', initialValue: ${field.defaultValue}).asIntorInitialValue,");
+          // } else {
+          buffer.writeln(
+              "${field.key}: pick(json, '${field.annotationKeyName ?? field.key}').${(field.isNullable) ? 'asIntorNull' : 'asIntorThrow'} ,");
+          // }
         } else if (field.typeData.isDartCoreBool) {
-          if (field.defaultValue != null) {
-            buffer.writeln(
-                "${field.key}: pick(json, '${field.annotationKeyName ?? field.key}', initialValue: ${field.defaultValue}).asBoolorInitialValue,");
-          } else {
-            buffer.writeln(
-                "${field.key}: pick(json, '${field.annotationKeyName ?? field.key}').${(field.isNullable) ? 'asBoolorNull' : 'asBoolorThrow'} ,");
-          }
+          // if (field.defaultValue != null) {
+          // buffer.writeln(
+          // "${field.key}: pick(json, '${field.annotationKeyName ?? field.key}', initialValue: ${field.defaultValue}).asBoolorInitialValue,");
+          // } else {
+          buffer.writeln(
+              "${field.key}: pick(json, '${field.annotationKeyName ?? field.key}').${(field.isNullable) ? 'asBoolorNull' : 'asBoolorThrow'} ,");
+          // }
         } else if (field.typeData.isDartCoreString) {
-          if (field.defaultValue != null) {
-            buffer.writeln(
-                "${field.key}: pick(json, '${field.annotationKeyName ?? field.key}', initialValue: ${field.defaultValue}).asStringorInitialValue,");
-          } else {
-            buffer.writeln(
-                "${field.key}: pick(json, '${field.annotationKeyName ?? field.key}').${(field.isNullable) ? 'asStringorNull' : 'asStringorThrow'} ,");
-          }
+          // if (field.defaultValue != null) {
+          // buffer.writeln(
+          // "${field.key}: pick(json, '${field.annotationKeyName ?? field.key}', initialValue: ${field.defaultValue}).asStringorInitialValue,");
+          // } else {
+          buffer.writeln(
+              "${field.key}: pick(json, '${field.annotationKeyName ?? field.key}').${(field.isNullable) ? 'asStringorNull' : 'asStringorThrow'} ,");
+          // }
         } else if (field.typeData.isDartCoreDouble) {
-          if (field.defaultValue != null) {
-            buffer.writeln(
-                "${field.key}: pick(json, '${field.annotationKeyName ?? field.key}', initialValue: ${field.defaultValue}).asDoubleorInitialValue,");
-          } else {
-            buffer.writeln(
-                "${field.key}: pick(json, '${field.annotationKeyName ?? field.key}').${(field.isNullable) ? 'asDoubleorNull' : 'asDoubleorThrow'} ,");
-          }
+          // if (field.defaultValue != null) {
+          // buffer.writeln(
+          // "${field.key}: pick(json, '${field.annotationKeyName ?? field.key}', initialValue: ${field.defaultValue}).asDoubleorInitialValue,");
+          // } else {
+          buffer.writeln(
+              "${field.key}: pick(json, '${field.annotationKeyName ?? field.key}').${(field.isNullable) ? 'asDoubleorNull' : 'asDoubleorThrow'} ,");
+          // }
         } else {
           if (field.isNullable) {
             buffer.writeln(
