@@ -185,7 +185,7 @@ class ModelVisitor extends SimpleElementVisitor {
     return null;
   }
 
-  Object? _getFieldDefaultValueAnnotation(FieldElement element) {
+  dynamic _getFieldDefaultValueAnnotation(FieldElement element) {
     final isHasAnnotation = _methodHasAnnotation(JsonKey, element);
     if (isHasAnnotation) {
       return _coreChecker.firstAnnotationOf(element)?.getField('defaultValue');
@@ -204,7 +204,7 @@ class ModelVisitor extends SimpleElementVisitor {
     if (!element.isStatic) {
       final String? fieldName = _getFieldNameAnnotation(element);
       final bool? isIgnore = _getFieldIgnoreAnnotation(element);
-      final Object? defaultValue = _getFieldDefaultValueAnnotation(element);
+      final dynamic defaultValue = _getFieldDefaultValueAnnotation(element);
 
       fields.add(
         HandlingObject(
@@ -221,7 +221,7 @@ class ModelVisitor extends SimpleElementVisitor {
 }
 
 // function toJson not consider to make a toJsonMap
-// Default Value 
+// Default Value (done)
 // Make safe if inside list there is another type data
 // Make it consider with params ignore (done)
 // consider with JsonKey Params (done)

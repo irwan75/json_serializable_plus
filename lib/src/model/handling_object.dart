@@ -4,7 +4,7 @@ class HandlingObject {
   final String key;
   final String? annotationKeyName;
   final bool? annotationisIgnore;
-  final Object? defaultValue;
+  final dynamic defaultValue;
   final DartType typeData;
   final bool isNullable;
   HandlingObject({
