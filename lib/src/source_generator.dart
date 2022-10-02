@@ -8,16 +8,16 @@ import 'package:source_gen/source_gen.dart';
 import 'model/handling_object.dart';
 
 class SerializeGenerator extends GeneratorForAnnotation<JsonAnnotationPlus> {
-  bool isCreateToJson(ConstantReader annotation) =>
+  bool _isCreateToJson(ConstantReader annotation) =>
       annotation.read('createToJson').boolValue;
 
-  bool isListNotObject(String value) =>
+  bool _isListNotObject(String value) =>
       value.contains('String') ||
       value.contains('int') ||
       value.contains('bool') ||
       value.contains('double');
 
-  String getTopLevelTypeData(String value) {
+  String _getTopLevelTypeData(String value) {
     if (value.contains('int')) {
       return 'int';
     } else if (value.contains('bool')) {
@@ -29,11 +29,11 @@ class SerializeGenerator extends GeneratorForAnnotation<JsonAnnotationPlus> {
     }
   }
 
-  String getObjectTypeDataWithoutNull(String objectName) {
+  String _getObjectTypeDataWithoutNull(String objectName) {
     return objectName.replaceAll('?', '').replaceAll(RegExp('(List<|>)'), '');
   }
 
-  String buildFromJson(ModelVisitor visitor) {
+  String _buildFromJson(ModelVisitor visitor) {
     var buffer = StringBuffer();
 
     if (visitor.className != null) {
@@ -43,46 +43,47 @@ class SerializeGenerator extends GeneratorForAnnotation<JsonAnnotationPlus> {
           '$className _\$${className}FromJson(Map<String, dynamic> json) => $className(');
 
       for (var field in visitor.fields) {
-        if (field.value.isDartCoreList) {
-          if (isListNotObject(field.value.toString())) {
+        if (field.annotationisIgnore ?? false) {
+        } else if (field.value.isDartCoreList) {
+          if (_isListNotObject(field.value.toString())) {
             final topLevelTypeData =
-                getTopLevelTypeData(field.value.toString());
+                _getTopLevelTypeData(field.value.toString());
 
             if (field.isNullable) {
               buffer.writeln(
-                  "${field.key}: (json['${field.key}'] as List<dynamic>?)?.map((e) => e as $topLevelTypeData).toList(),");
+                  "${field.key}: (json['${field.annotationKeyName ?? field.key}'] as List<dynamic>?)?.map((e) => e as $topLevelTypeData).toList(),");
             } else {
               buffer.writeln(
-                  "${field.key}: (json['${field.key}'] as List<dynamic>).map((e) => e as $topLevelTypeData).toList(),");
+                  "${field.key}: (json['${field.annotationKeyName ?? field.key}'] as List<dynamic>).map((e) => e as $topLevelTypeData).toList(),");
             }
           } else {
             if (field.isNullable) {
               buffer.writeln(
-                  "${field.key}: (json['${field.key}'] as List<dynamic>?)?.map((e)=> ${getObjectTypeDataWithoutNull(field.value.toString())}.fromJson(e as Map<String, dynamic>)).toList(),");
+                  "${field.key}: (json['${field.annotationKeyName ?? field.key}'] as List<dynamic>?)?.map((e)=> ${_getObjectTypeDataWithoutNull(field.value.toString())}.fromJson(e as Map<String, dynamic>)).toList(),");
             } else {
               buffer.writeln(
-                  "${field.key}: (json['${field.key}'] as List<dynamic>).map((e)=> ${getObjectTypeDataWithoutNull(field.value.toString())}.fromJson(e as Map<String, dynamic>)).toList(),");
+                  "${field.key}: (json['${field.annotationKeyName ?? field.key}'] as List<dynamic>).map((e)=> ${_getObjectTypeDataWithoutNull(field.value.toString())}.fromJson(e as Map<String, dynamic>)).toList(),");
             }
           }
         } else if (field.value.isDartCoreInt) {
           buffer.writeln(
-              "${field.key}: pick(json, '${field.key}').${(field.isNullable) ? 'asIntorNull' : 'asIntorThrow'} ,");
+              "${field.key}: pick(json, '${field.annotationKeyName ?? field.key}').${(field.isNullable) ? 'asIntorNull' : 'asIntorThrow'} ,");
         } else if (field.value.isDartCoreBool) {
           buffer.writeln(
-              "${field.key}: pick(json, '${field.key}').${(field.isNullable) ? 'asBoolorNull' : 'asBoolorThrow'} ,");
+              "${field.key}: pick(json, '${field.annotationKeyName ?? field.key}').${(field.isNullable) ? 'asBoolorNull' : 'asBoolorThrow'} ,");
         } else if (field.value.isDartCoreString) {
           buffer.writeln(
-              "${field.key}: pick(json, '${field.key}').${(field.isNullable) ? 'asStringorNull' : 'asStringorThrow'} ,");
+              "${field.key}: pick(json, '${field.annotationKeyName ?? field.key}').${(field.isNullable) ? 'asStringorNull' : 'asStringorThrow'} ,");
         } else if (field.value.isDartCoreDouble) {
           buffer.writeln(
-              "${field.key}: pick(json, '${field.key}').${(field.isNullable) ? 'asDoubleorNull' : 'asDoubleorThrow'} ,");
+              "${field.key}: pick(json, '${field.annotationKeyName ?? field.key}').${(field.isNullable) ? 'asDoubleorNull' : 'asDoubleorThrow'} ,");
         } else {
           if (field.isNullable) {
             buffer.writeln(
-                "${field.key}: json['${field.key}'] == null ? null : ${field.value}.fromJson(json['${field.key}'] as Map<String, dynamic>),");
+                "${field.key}: json['${field.annotationKeyName ?? field.key}'] == null ? null : ${field.value}.fromJson(json['${field.annotationKeyName ?? field.key}'] as Map<String, dynamic>),");
           } else {
             buffer.writeln(
-                "${field.key}: ${field.value}.fromJson(json['${field.key}'] as Map<String, dynamic>),");
+                "${field.key}: ${field.value}.fromJson(json['${field.annotationKeyName ?? field.key}'] as Map<String, dynamic>),");
           }
         }
       }
@@ -93,7 +94,7 @@ class SerializeGenerator extends GeneratorForAnnotation<JsonAnnotationPlus> {
     return buffer.toString();
   }
 
-  String buildToJson(ModelVisitor visitor) {
+  String _buildToJson(ModelVisitor visitor) {
     var buffer = StringBuffer();
 
     if (visitor.className != null) {
@@ -120,10 +121,10 @@ class SerializeGenerator extends GeneratorForAnnotation<JsonAnnotationPlus> {
 
     element.visitChildren(visitor);
 
-    buffer.writeln(buildFromJson(visitor));
+    buffer.writeln(_buildFromJson(visitor));
 
-    if (isCreateToJson(annotation)) {
-      buffer.writeln(buildToJson(visitor));
+    if (_isCreateToJson(annotation)) {
+      buffer.writeln(_buildToJson(visitor));
     }
 
     return buffer.toString();
@@ -140,12 +141,47 @@ class ModelVisitor extends SimpleElementVisitor {
     className = element.type.returnType;
   }
 
+  final _coreChecker = const TypeChecker.fromRuntime(JsonKey);
+
+  String? _getFieldNameAnnotation(FieldElement element) {
+    final isHasAnnotation = _methodHasAnnotation(JsonKey, element);
+    if (isHasAnnotation) {
+      return _coreChecker
+          .firstAnnotationOf(element)
+          ?.getField('name')
+          ?.toStringValue();
+    }
+    return null;
+  }
+
+  bool? _getFieldIgnoreAnnotation(FieldElement element) {
+    final isHasAnnotation = _methodHasAnnotation(JsonKey, element);
+    if (isHasAnnotation) {
+      return _coreChecker
+          .firstAnnotationOf(element)
+          ?.getField('ignore')
+          ?.toBoolValue();
+    }
+    return null;
+  }
+
+  bool _methodHasAnnotation(Type annotationType, FieldElement element) {
+    final annotations =
+        TypeChecker.fromRuntime(annotationType).annotationsOf(element);
+    return annotations.isNotEmpty;
+  }
+
   @override
   visitFieldElement(FieldElement element) {
     if (!element.isStatic) {
+      final String? fieldName = _getFieldNameAnnotation(element);
+      final bool? isIgnore = _getFieldIgnoreAnnotation(element);
+
       fields.add(
         HandlingObject(
           key: element.name,
+          annotationKeyName: fieldName,
+          annotationisIgnore: isIgnore,
           value: element.type,
           isNullable: element.type.toString().contains('?'),
         ),
@@ -154,8 +190,11 @@ class ModelVisitor extends SimpleElementVisitor {
   }
 }
 
+// function toJson not consider to make a toJsonMap
+// Make it consider with params ignore
 // Default Value
 // Make safe if inside list there is another type data
+// consider with JsonKey Params (done)
 // List<Object> (done)
 // List<Not Object> (done)
 // Nullable (done)
