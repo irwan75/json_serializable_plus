@@ -1,3 +1,4 @@
+import 'package:analyzer/dart/constant/value.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/dart/element/visitor.dart';
@@ -49,54 +50,60 @@ class SerializeGenerator extends GeneratorForAnnotation<JsonAnnotationPlus> {
             final topLevelTypeData =
                 _getTopLevelTypeData(field.typeData.toString());
 
-            if (field.isNullable) {
+            if (field.isNullable || field.defaultValue != null) {
+              String valueSafe = '';
+              if (field.defaultValue != null) valueSafe = '?? []';
+
               buffer.writeln(
-                  "${field.key}: (json['${field.annotationKeyName ?? field.key}'] as List<dynamic>?)?.map((e) => e as $topLevelTypeData).toList(),");
+                  "${field.key}: (json['${field.annotationKeyName ?? field.key}'] as List<dynamic>?)?.map((e) => e as $topLevelTypeData).toList() $valueSafe,");
             } else {
               buffer.writeln(
                   "${field.key}: (json['${field.annotationKeyName ?? field.key}'] as List<dynamic>).map((e) => e as $topLevelTypeData).toList(),");
             }
           } else {
-            if (field.isNullable) {
+            if (field.isNullable || field.defaultValue != null) {
+              String valueSafe = '';
+              if (field.defaultValue != null) valueSafe = '?? []';
+
               buffer.writeln(
-                  "${field.key}: (json['${field.annotationKeyName ?? field.key}'] as List<dynamic>?)?.map((e)=> ${_getObjectTypeDataWithoutNull(field.typeData.toString())}.fromJson(e as Map<String, dynamic>)).toList(),");
+                  "${field.key}: (json['${field.annotationKeyName ?? field.key}'] as List<dynamic>?)?.map((e)=> ${_getObjectTypeDataWithoutNull(field.typeData.toString())}.fromJson(e as Map<String, dynamic>)).toList() $valueSafe,");
             } else {
               buffer.writeln(
                   "${field.key}: (json['${field.annotationKeyName ?? field.key}'] as List<dynamic>).map((e)=> ${_getObjectTypeDataWithoutNull(field.typeData.toString())}.fromJson(e as Map<String, dynamic>)).toList(),");
             }
           }
         } else if (field.typeData.isDartCoreInt) {
-          // if (field.defaultValue != null) {
-          //   buffer.writeln(
-          //       "${field.key}: pick(json, '${field.annotationKeyName ?? field.key}', initialValue: ${field.defaultValue}).asIntorInitialValue,");
-          // } else {
-          buffer.writeln(
-              "${field.key}: pick(json, '${field.annotationKeyName ?? field.key}').${(field.isNullable) ? 'asIntorNull' : 'asIntorThrow'} ,");
-          // }
+          if (field.defaultValue != null) {
+            buffer.writeln(
+                "${field.key}: pick(json, '${field.annotationKeyName ?? field.key}', initialValue: ${field.defaultValue as int}).asIntorInitialValue,");
+          } else {
+            buffer.writeln(
+                "${field.key}: pick(json, '${field.annotationKeyName ?? field.key}').${(field.isNullable) ? 'asIntorNull' : 'asIntorThrow'} ,");
+          }
         } else if (field.typeData.isDartCoreBool) {
-          // if (field.defaultValue != null) {
-          // buffer.writeln(
-          // "${field.key}: pick(json, '${field.annotationKeyName ?? field.key}', initialValue: ${field.defaultValue}).asBoolorInitialValue,");
-          // } else {
-          buffer.writeln(
-              "${field.key}: pick(json, '${field.annotationKeyName ?? field.key}').${(field.isNullable) ? 'asBoolorNull' : 'asBoolorThrow'} ,");
-          // }
+          if (field.defaultValue != null) {
+            buffer.writeln(
+                "${field.key}: pick(json, '${field.annotationKeyName ?? field.key}', initialValue: ${field.defaultValue as bool}).asBoolorInitialValue,");
+          } else {
+            buffer.writeln(
+                "${field.key}: pick(json, '${field.annotationKeyName ?? field.key}').${(field.isNullable) ? 'asBoolorNull' : 'asBoolorThrow'} ,");
+          }
         } else if (field.typeData.isDartCoreString) {
-          // if (field.defaultValue != null) {
-          // buffer.writeln(
-          // "${field.key}: pick(json, '${field.annotationKeyName ?? field.key}', initialValue: ${field.defaultValue}).asStringorInitialValue,");
-          // } else {
-          buffer.writeln(
-              "${field.key}: pick(json, '${field.annotationKeyName ?? field.key}').${(field.isNullable) ? 'asStringorNull' : 'asStringorThrow'} ,");
-          // }
+          if (field.defaultValue != null) {
+            buffer.writeln(
+                "${field.key}: pick(json, '${field.annotationKeyName ?? field.key}', initialValue: '${field.defaultValue as String}').asStringorInitialValue,");
+          } else {
+            buffer.writeln(
+                "${field.key}: pick(json, '${field.annotationKeyName ?? field.key}').${(field.isNullable) ? 'asStringorNull' : 'asStringorThrow'} ,");
+          }
         } else if (field.typeData.isDartCoreDouble) {
-          // if (field.defaultValue != null) {
-          // buffer.writeln(
-          // "${field.key}: pick(json, '${field.annotationKeyName ?? field.key}', initialValue: ${field.defaultValue}).asDoubleorInitialValue,");
-          // } else {
-          buffer.writeln(
-              "${field.key}: pick(json, '${field.annotationKeyName ?? field.key}').${(field.isNullable) ? 'asDoubleorNull' : 'asDoubleorThrow'} ,");
-          // }
+          if (field.defaultValue != null) {
+            buffer.writeln(
+                "${field.key}: pick(json, '${field.annotationKeyName ?? field.key}', initialValue: ${field.defaultValue as double}).asDoubleorInitialValue,");
+          } else {
+            buffer.writeln(
+                "${field.key}: pick(json, '${field.annotationKeyName ?? field.key}').${(field.isNullable) ? 'asDoubleorNull' : 'asDoubleorThrow'} ,");
+          }
         } else {
           if (field.isNullable) {
             buffer.writeln(
@@ -185,7 +192,7 @@ class ModelVisitor extends SimpleElementVisitor {
     return null;
   }
 
-  dynamic _getFieldDefaultValueAnnotation(FieldElement element) {
+  DartObject? _getFieldDefaultValueAnnotation(FieldElement element) {
     final isHasAnnotation = _methodHasAnnotation(JsonKey, element);
     if (isHasAnnotation) {
       return _coreChecker.firstAnnotationOf(element)?.getField('defaultValue');
@@ -200,11 +207,25 @@ class ModelVisitor extends SimpleElementVisitor {
   }
 
   @override
-  visitFieldElement(FieldElement element) {
+  visitFieldElement(FieldElement element) async {
     if (!element.isStatic) {
       final String? fieldName = _getFieldNameAnnotation(element);
       final bool? isIgnore = _getFieldIgnoreAnnotation(element);
-      final dynamic defaultValue = _getFieldDefaultValueAnnotation(element);
+      final DartObject? getDartObject =
+          _getFieldDefaultValueAnnotation(element);
+
+      var defaultValue;
+      if (getDartObject?.type?.isDartCoreString ?? false) {
+        defaultValue = getDartObject?.toStringValue();
+      } else if (getDartObject?.type?.isDartCoreInt ?? false) {
+        defaultValue = getDartObject?.toIntValue();
+      } else if (getDartObject?.type?.isDartCoreDouble ?? false) {
+        defaultValue = getDartObject?.toDoubleValue();
+      } else if (getDartObject?.type?.isDartCoreBool ?? false) {
+        defaultValue = getDartObject?.toBoolValue();
+      } else if (getDartObject?.type?.isDartCoreList ?? false) {
+        defaultValue = getDartObject?.toListValue();
+      }
 
       fields.add(
         HandlingObject(
@@ -220,9 +241,10 @@ class ModelVisitor extends SimpleElementVisitor {
   }
 }
 
+// add enum
 // function toJson not consider to make a toJsonMap
-// Default Value (done)
 // Make safe if inside list there is another type data
+// Default Value (done)
 // Make it consider with params ignore (done)
 // consider with JsonKey Params (done)
 // List<Object> (done)

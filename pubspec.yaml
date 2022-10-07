@@ -13,6 +13,8 @@ dependencies:
   build: ^2.3.1
   json_annotation_plus:
     git: https://github.com/irwan75/json_annotation_plus.git
+  # json_annotation_plus:
+    # path: ../json_annotation_plus  
   source_gen: ^1.2.5
 
 # dev_dependencies:
