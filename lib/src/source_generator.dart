@@ -12,6 +12,12 @@ class SerializeGenerator extends GeneratorForAnnotation<JsonAnnotationPlus> {
   bool _isCreateToJson(ConstantReader annotation) =>
       annotation.read('createToJson').boolValue;
 
+  bool _isTopLevelTypeData(DartType typeData) =>
+      typeData.isDartCoreDouble ||
+      typeData.isDartCoreString ||
+      typeData.isDartCoreBool ||
+      typeData.isDartCoreInt;
+
   bool _isListNotObject(String value) =>
       value.contains('String') ||
       value.contains('int') ||
@@ -131,7 +137,23 @@ class SerializeGenerator extends GeneratorForAnnotation<JsonAnnotationPlus> {
           'Map<String, dynamic> _\$${className}ToJson($className instance) => <String, dynamic>{');
 
       for (var field in visitor.fields) {
-        buffer.writeln("'${field.key}': instance.${field.key},");
+        if (!(field.annotationisIgnore ?? false)) {
+          if (_isTopLevelTypeData(field.typeData)) {
+            buffer.writeln(
+                "'${field.annotationKeyName ?? field.key}': instance.${field.key},");
+          } else if (field.typeData.isDartCoreList) {
+            if (_isListNotObject(field.typeData.toString())) {
+              buffer.writeln(
+                  "'${field.annotationKeyName ?? field.key}': instance.${field.key},");
+            } else {
+              buffer.writeln(
+                  "'${field.annotationKeyName ?? field.key}': instance.${field.key}${field.isNullable ? '?' : ''}.map((x) => x.toMap()).toList(),");
+            }
+          } else {
+            buffer.writeln(
+                "'${field.annotationKeyName ?? field.key}': instance.${field.key}${field.isNullable ? '?' : ''}.toJson(),");
+          }
+        }
       }
 
       buffer.writeln('};');
@@ -242,8 +264,8 @@ class ModelVisitor extends SimpleElementVisitor {
 }
 
 // add enum
-// function toJson not consider to make a toJsonMap
 // Make safe if inside list there is another type data
+// function toJson not consider to make a toJsonMap (done)
 // Default Value (done)
 // Make it consider with params ignore (done)
 // consider with JsonKey Params (done)
