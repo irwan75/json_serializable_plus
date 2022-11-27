@@ -147,7 +147,7 @@ class SerializeGenerator extends GeneratorForAnnotation<JsonAnnotationPlus> {
                   "'${field.annotationKeyName ?? field.key}': instance.${field.key},");
             } else {
               buffer.writeln(
-                  "'${field.annotationKeyName ?? field.key}': instance.${field.key}${field.isNullable ? '?' : ''}.map((x) => x.toMap()).toList(),");
+                  "'${field.annotationKeyName ?? field.key}': instance.${field.key}${field.isNullable ? '?' : ''}.map((x) => x.toJson()).toList(),");
             }
           } else {
             buffer.writeln(
