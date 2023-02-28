@@ -25,12 +25,20 @@ class SerializeGenerator extends GeneratorForAnnotation<JsonAnnotationPlus> {
       value.contains('double');
 
   String _getTopLevelTypeData(String value) {
-    if (value.contains('int')) {
+    if (value.contains('int?')) {
+      return 'int?';
+    } else if (value.contains('int')) {
       return 'int';
+    } else if (value.contains('bool?')) {
+      return 'bool?';
     } else if (value.contains('bool')) {
       return 'bool';
+    } else if (value.contains('double?')) {
+      return 'double?';
     } else if (value.contains('double')) {
       return 'double';
+    } else if (value.contains('String?')) {
+      return 'String?';
     } else {
       return 'String';
     }
@@ -256,7 +264,7 @@ class ModelVisitor extends SimpleElementVisitor {
           annotationisIgnore: isIgnore,
           typeData: element.type,
           defaultValue: defaultValue,
-          isNullable: element.type.toString().contains('?'),
+          isNullable: element.type.toString().endsWith('?'),
         ),
       );
     }
