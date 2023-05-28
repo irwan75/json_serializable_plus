@@ -1,8 +1,15 @@
+targets:
+  $default:
+    builders:
+      jsonAnnotationPlus|annotations:
+        enabled: true
+
 builders:
   jsonAnnotationPlus:
+    # target: ':jsonAnnotationPlus'
     import: 'package:json_serializable_plus/json_serializable_plus.dart'
-    builder_factories: ['jsonAnnotationPlus']
+    builder_factories: ["generateJsonClass"]
+    build_extensions: {".dart": ["jsonAnnotationPlus.g.part"]}
     auto_apply: dependents
-    build_extensions: {".dart": [".serialize.part"]}
     build_to: cache
     applies_builders: ["source_gen|combining_builder"]

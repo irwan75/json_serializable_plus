@@ -188,7 +188,7 @@ class SerializeGenerator extends GeneratorForAnnotation<JsonAnnotationPlus> {
   }
 }
 
-class ModelVisitor extends SimpleElementVisitor {
+class ModelVisitor extends SimpleElementVisitor<void> {
   DartType? className;
   List<HandlingObject> fields = [];
 
