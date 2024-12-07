@@ -259,12 +259,12 @@ class ModelVisitor extends SimpleElementVisitor<void> {
     if (!element.isStatic) {
       final String? fieldName = _getFieldNameAnnotation(element);
 
-      final bool? isSetterGetter = _getFieldIsSetterGetter(element);
+      // final bool? isSetterGetter = _getFieldIsSetterGetter(element);
       final bool? isIgnore = _getFieldIgnoreAnnotation(element);
 
-      print('element name ${element.name}');
-      print('is setter getter $isSetterGetter');
-      print('is ignore $isIgnore');
+      // print('element name ${element.name}');
+      // print('is setter getter $isSetterGetter');
+      // print('is ignore $isIgnore');
 
       final DartObject? getDartObject =
           _getFieldDefaultValueAnnotation(element);
