@@ -222,6 +222,24 @@ class ModelVisitor extends SimpleElementVisitor<void> {
     return null;
   }
 
+  bool? _getFieldIsSetterGetter(FieldElement element) {
+    // print('element name ${element.name}');
+    // print('element getter ${element.declaration.getter}');
+    // print('element setter ${element.declaration.}');
+    // if (element.getter != null) {
+    //   print('${element.name} element isGetter');
+    // }
+    if (element.declaration.setter != null) {
+      return true;
+    }
+
+    // if ((element.getter?.isGetter ?? false) ||
+    //     (element.setter?.isSetter ?? false)) {
+    //   return true;
+    // }
+    return null;
+  }
+
   DartObject? _getFieldDefaultValueAnnotation(FieldElement element) {
     final isHasAnnotation = _methodHasAnnotation(JsonKey, element);
     if (isHasAnnotation) {
@@ -240,7 +258,14 @@ class ModelVisitor extends SimpleElementVisitor<void> {
   visitFieldElement(FieldElement element) async {
     if (!element.isStatic) {
       final String? fieldName = _getFieldNameAnnotation(element);
+
+      final bool? isSetterGetter = _getFieldIsSetterGetter(element);
       final bool? isIgnore = _getFieldIgnoreAnnotation(element);
+
+      print('element name ${element.name}');
+      print('is setter getter $isSetterGetter');
+      print('is ignore $isIgnore');
+
       final DartObject? getDartObject =
           _getFieldDefaultValueAnnotation(element);
 
@@ -261,6 +286,7 @@ class ModelVisitor extends SimpleElementVisitor<void> {
         HandlingObject(
           key: element.name,
           annotationKeyName: fieldName,
+          // annotationisIgnore: isIgnore ?? isSetterGetter,
           annotationisIgnore: isIgnore,
           typeData: element.type,
           defaultValue: defaultValue,
@@ -273,11 +299,4 @@ class ModelVisitor extends SimpleElementVisitor<void> {
 
 // add enum
 // Make safe if inside list there is another type data
-// function toJson not consider to make a toJsonMap (done)
-// Default Value (done)
-// Make it consider with params ignore (done)
-// consider with JsonKey Params (done)
-// List<Object> (done)
-// List<Not Object> (done)
-// Nullable (done)
-// Convert to Safe Call Converter Json (done)
+// Make Set and Get not include on json_generator

@@ -1,7 +1,7 @@
 name: json_serializable_plus
-description: A starting point for Dart libraries or applications.
+description: A dart package to detect serializable for generate a class model
 version: 1.1.0
-# homepage: https://www.example.com
+homepage: https://github.com/irwan75/json_serializable_plus.git
 
 publish_to: none
 
@@ -22,3 +22,8 @@ dependencies:
 # dev_dependencies:
   # lints: ^2.0.0
   # test: ^1.16.0
+
+topics:
+  - json_annotation_plus
+  - source_gen
+  - build
