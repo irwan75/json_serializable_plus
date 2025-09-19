@@ -312,9 +312,38 @@ class ModelVisitor extends ElementVisitor2<void> {
         defaultValue = getDartObject?.toBoolValue();
       } else if (getDartObject?.type?.isDartCoreList ?? false) {
         defaultValue = getDartObject?.toListValue();
-      } else if (getDartObject?.type?.isDartCoreMap ?? false) {
-        defaultValue = getDartObject?.toMapValue();
       }
+      //  else if (getDartObject?.type?.isDartCoreMap ?? false) {
+      //   defaultValue = getDartObject?.toMapValue()?.map<String, dynamic>((
+      //     key,
+      //     value,
+      //   ) {
+      //     final keyString = key?.toStringValue() ?? key.toString();
+      //     dynamic valueDynamic;
+      //     if (value?.type?.isDartCoreString ?? false) {
+      //       valueDynamic = value?.toStringValue();
+      //     }else if (value?.type?.isDartCoreInt ?? false) {
+      //       valueDynamic = value?.toIntValue();
+      //     } else if (value?.type?.isDartCoreDouble ?? false) {
+      //       valueDynamic = value?.toDoubleValue();
+      //     } else if (value?.type?.isDartCoreBool ?? false) {
+      //       valueDynamic = value?.toBoolValue();
+      //     } else if (value?.type?.isDartCoreList ?? false) {
+      //       valueDynamic = value?.toListValue();
+      //     } else if (value?.type?.isDartCoreMap ?? false) {
+      //       valueDynamic = value?.toMapValue();
+      //     } else {
+      //       valueDynamic = value?.toStringValue();
+      //     }
+
+      //     return MapEntry(
+      //       "'$keyString'",
+      //       value?.type?.isDartCoreString == true
+      //           ? "'${value?.toStringValue()}'"
+      //           : value?.toStringValue(),
+      //     );
+      //   });
+      // }
 
       fields.add(
         HandlingObject(
