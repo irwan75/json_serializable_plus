@@ -16,7 +16,7 @@ dependencies:
   json_annotation_plus:
     git: 
       url: https://github.com/irwan75/json_annotation_plus.git
-      ref: 2.0.0
+      ref: dev
   # json_annotation_plus:
   #   path: ../json_annotation_plus  
   # source_gen: ">=1.2.7 <1.6.0"
